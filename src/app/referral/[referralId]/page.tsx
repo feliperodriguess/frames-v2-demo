@@ -17,28 +17,41 @@ const frame = {
   },
 };
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ referralId: string }>;
+}): Promise<Metadata> {
+  const { referralId } = await params;
   return {
-    title: "Frame v2 Example",
+    title: `Referral ID: ${referralId}`,
     openGraph: {
-      title: "Frame v2 Example",
+      title: `Referral ID: ${referralId}`,
       description: "Explore Frames v2!",
     },
     other: {
-      "fc:frame": JSON.stringify(frame),
+      "fc:frame": JSON.stringify({
+        ...frame,
+        button: {
+          title: `Referral ID: ${referralId}`,
+          action: {
+            ...frame.button.action,
+            url: `${appUrl}/referral/${referralId}`,
+          },
+        },
+      }),
     },
   };
 }
 
-export default async function Home({
-  searchParams,
+export default async function ReferralPage({
+  params,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: Promise<{ referralId: string }>;
 }) {
-  const { referralId } = await searchParams;
+  const { referralId } = await params;
   return (
     <main className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-4xl font-bold">Hello Frames v2!</h1>
       {referralId && <p className="mt-2 text-2xl">Referral ID: {referralId}</p>}
     </main>
   );
